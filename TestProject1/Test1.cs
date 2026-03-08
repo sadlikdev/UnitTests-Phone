@@ -38,38 +38,43 @@ namespace TestProject1
             string phoneNumber = "123456789";
             Assert.Throws<ArgumentException>(() => new Phone(owner, phoneNumber));
         }
-
+        [TestMethod]
+        public void Check_If_Owner_Returns_Value()
+        {
+            string expectedOwner = "John Doe";
+            string phoneNumber = "123456789";
+            var phone = new Phone(expectedOwner, phoneNumber);
+            Assert.AreEqual(expectedOwner, phone.Owner);
+        }
     }
 
     [TestClass]
     public sealed class PhoneNumerTest
     {
-
-        public void Check_If_Phone_Number_NonExistent_Throws_Exception()
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        public void Check_If_Phone_Number_NonExistentOrNull_Throws_SpecificException(string invalidNumber)
         {
             string owner = "John Doe";
-            string phoneNumber = "";
-            Assert.Throws<ArgumentException>(() => new Phone(owner, phoneNumber));
+            string expectedMessage = "Phone number is empty or null!";
+            Assert.AreEqual (expectedMessage, Assert.Throws<ArgumentException>(() => new Phone(owner, invalidNumber)).Message);
+
         }
 
-        public void Check_If_Phone_Number_Null_Throws_Exception()
-        {
-            string owner = "John Doe";
-            string phoneNumber = null;
-            Assert.Throws<ArgumentException>(() => new Phone(owner, phoneNumber));
-        }
 
         [DataTestMethod]
         [DataRow("0123456789")]
         [DataRow("123")]
         [DataRow("123@34%6&8")]
+        [DataRow("908 786 543")]
         public void Check_If_Phone_Number_Invalid_Throws_Exception(string nrTel)
         {
             string owner = "John Doe";
             string phoneNumber = nrTel;
             Assert.Throws<ArgumentException>(() => new Phone(owner, phoneNumber));
         }
-        
+
         [DataTestMethod]
         [DataRow("526954852")]
         [DataRow("456218422")]
@@ -78,7 +83,98 @@ namespace TestProject1
         {
             string owner = "John Doe";
             var phone = new Phone(owner, phonenr);
-            Assert.AreEqual(phonenr, phone.PhoneNumber);
+            Assert. AreEqual(phonenr, phone.PhoneNumber);
+
         }
+        [TestMethod]
+        public void Check_If_Phone_Number_Returns_Value()
+        {
+            string owner = "John Doe";
+            string expectedPhoneNumber = "123456789";
+            var phone = new Phone(owner, expectedPhoneNumber);
+            Assert.AreEqual(expectedPhoneNumber, phone.PhoneNumber);
+        }
+
+        [TestMethod]
+        public void Check_If_Phone_Number_Valid_Bool_True()
+        {
+            string owner = "John Doe";
+            string phoneNumber = "123456789";
+            var phone = new Phone(owner, phoneNumber);
+            Assert.AreEqual(phoneNumber, phone.PhoneNumber);
+        }
+
+
+
+
     }
+
+    [TestClass]
+    public sealed class OtherTests
+    {
+        [TestMethod]
+        public void Check_If_Phone_Book_Empty()
+        {
+            string owner = "John Doe";
+            string phoneNumber = "123456789";
+            var phone = new Phone(owner, phoneNumber);
+            Assert.AreEqual(0, phone.Count);
+        }
+        
+        [TestMethod]    
+        public void Check_If_Over_Capacity_Throws_Exception()
+        {
+            string owner = "John Doe";
+            string phoneNumber = "123456789";
+            var phone = new Phone(owner, phoneNumber);
+            for (int i = 0; i < phone.PhoneBookCapacity; i++)
+            {
+                phone.AddContact($"Contact{i}", $"12345678{i}");
+            }
+            Assert.Throws<InvalidOperationException>(() => phone.AddContact("ExtraContact", "123456789"));
+        }   
+        [TestMethod]    
+        public void Capacity_Returns_100()
+        {
+            
+            var phone = new Phone("John Doe", "123456789");
+            int capacity = phone.PhoneBookCapacity;
+            Assert.AreEqual(100, capacity);
+            
+        }
+
+        [TestMethod]
+        public void AddContact_DuplicateName_ShouldReturnFalse()
+        {
+            
+            var phone = new Phone("Jan Kowalski", "123456789");
+            string name = "Adam Nowak";
+            string number1 = "111222333";
+            string number2 = "444555666";
+
+            bool firstAttempt = phone.AddContact(name, number1);
+            bool secondAttempt = phone.AddContact(name, number2);
+            
+            Assert.IsTrue(firstAttempt, "Pierwsze dodanie kontaktu powinno się udać.");
+            Assert.IsFalse(secondAttempt, "Drugie dodanie kontaktu o tej samej nazwie powinno zwrócić false.");
+
+        }
+            
+
+            
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
 }
